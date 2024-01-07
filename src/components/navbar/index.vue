@@ -150,17 +150,9 @@
             :size="32"
             :style="{ marginRight: '8px', cursor: 'pointer' }"
           >
-            <img alt="avatar" :src="avatar" />
+            {{ username }}
           </a-avatar>
           <template #content>
-            <a-doption>
-              <a-space @click="switchRoles">
-                <icon-tag />
-                <span>
-                  {{ $t('messageBox.switchRoles') }}
-                </span>
-              </a-space>
-            </a-doption>
             <a-doption>
               <a-space @click="$router.push({ name: 'Info' })">
                 <icon-user />
@@ -194,7 +186,6 @@
 
 <script lang="ts" setup>
   import { computed, ref, inject } from 'vue';
-  import { Message } from '@arco-design/web-vue';
   import { useDark, useToggle, useFullscreen } from '@vueuse/core';
   import { useAppStore, useUserStore } from '@/store';
   import { LOCALE_OPTIONS } from '@/locale';
@@ -209,8 +200,8 @@
   const { changeLocale, currentLocale } = useLocale();
   const { isFullscreen, toggle: toggleFullScreen } = useFullscreen();
   const locales = [...LOCALE_OPTIONS];
-  const avatar = computed(() => {
-    return userStore.avatar;
+  const username = computed(() => {
+    return userStore.username;
   });
   const theme = computed(() => {
     return appStore.theme;
@@ -254,10 +245,6 @@
       cancelable: true,
     });
     triggerBtn.value.dispatchEvent(event);
-  };
-  const switchRoles = async () => {
-    const res = await userStore.switchRoles();
-    Message.success(res as string);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 </script>

@@ -10,6 +10,16 @@ export default mergeConfig(
       fs: {
         strict: true,
       },
+      // 设置反向代理，跨域
+      proxy: {
+        '^/api': {
+          // 后台地址
+          target: 'http://127.0.0.1:10086',
+          changeOrigin: true,
+          ws: true, // 允许websocket代理
+          rewrite: (path: string) => path.replace(/^\/api/, ''),
+        },
+      },
     },
     plugins: [
       eslint({

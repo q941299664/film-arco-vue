@@ -3,13 +3,7 @@ import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
-
-export interface HttpResponse<T = unknown> {
-  status: number;
-  msg: string;
-  code: number;
-  data: T;
-}
+import { HttpResponse } from './types';
 
 if (import.meta.env.VITE_API_BASE_URL) {
   axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -26,7 +20,11 @@ axios.interceptors.request.use(
       if (!config.headers) {
         config.headers = {};
       }
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers = {
+        ...config.headers,
+        'x-access-token': token,
+      };
+      // config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -40,25 +38,23 @@ axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response.data;
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    if (res.code !== 200) {
       Message.error({
         content: res.msg || 'Error',
         duration: 5 * 1000,
       });
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (
-        [50008, 50012, 50014].includes(res.code) &&
-        response.config.url !== '/api/user/info'
+        [403].includes(res.code)
+        // response.config.url !== '/api/user/info'
       ) {
         Modal.error({
-          title: 'Confirm logout',
-          content:
-            'You have been logged out, you can cancel to stay on this page, or log in again',
-          okText: 'Re-Login',
+          title: '确认注销',
+          content: '您已注销，您可以取消停留在此页面，或重新登录',
+          okText: '跳转登录页',
           async onOk() {
             const userStore = useUserStore();
-
-            await userStore.logout();
+            userStore.logoutCallBack();
             window.location.reload();
           },
         });
@@ -69,7 +65,7 @@ axios.interceptors.response.use(
   },
   (error) => {
     Message.error({
-      content: error.msg || 'Request Error',
+      content: error.msg || '服务器错误',
       duration: 5 * 1000,
     });
     return Promise.reject(error);

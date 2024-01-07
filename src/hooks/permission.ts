@@ -1,5 +1,6 @@
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
 import { useUserStore } from '@/store';
+import Role from '@/api/permission/types';
 
 export default function usePermission() {
   const userStore = useUserStore();
@@ -9,16 +10,18 @@ export default function usePermission() {
         !route.meta?.requiresAuth ||
         !route.meta?.roles ||
         route.meta?.roles?.includes('*') ||
-        route.meta?.roles?.includes(userStore.role)
+        userStore.roles.some((item) => route.meta?.roles?.includes(item.name))
       );
     },
-    findFirstPermissionRoute(_routers: any, role = 'admin') {
+    findFirstPermissionRoute(_routers: any, roles: Role[] = []) {
       const cloneRouters = [..._routers];
       while (cloneRouters.length) {
         const firstElement = cloneRouters.shift();
         if (
           firstElement?.meta?.roles?.find((el: string[]) => {
-            return el.includes('*') || el.includes(role);
+            return (
+              el.includes('*') || roles.some((item) => el.includes(item.name))
+            );
           })
         )
           return { name: firstElement.name };
