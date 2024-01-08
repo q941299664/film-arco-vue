@@ -2,6 +2,9 @@ import localeMessageBox from '@/components/message-box/locale/zh-CN';
 import localeLogin from '@/views/login/locale/zh-CN';
 
 import localeHomeIndex from '@/views/home/locale/zh-CN';
+import localeUserManger from '@/views/systemManger/userManger/locale/zh-CN';
+import localeRoleManger from '@/views/systemManger/roleManger/locale/zh-CN';
+import localeFilmManger from '@/views/systemManger/filmManger/locale/zh-CN';
 
 import localeSettings from './zh-CN/settings';
 
@@ -10,8 +13,10 @@ export default {
   'menu.server.dashboard': '仪表盘-服务端',
   'menu.server.workplace': '工作台-服务端',
   'menu.server.monitor': '实时监控-服务端',
-  'menu.list': '列表页',
   'menu.home': '首页',
+  'menu.systemManger': '系统管理',
+  'menu.userManger': '用户管理',
+  'menu.roleManger': '角色管理',
   'menu.home.index': '首页',
   'menu.result': '结果页',
   'menu.exception': '异常页',
@@ -27,4 +32,6 @@ export default {
   ...localeMessageBox,
   ...localeLogin,
   ...localeHomeIndex,
+  ...localeUserManger,
+  ...localeRoleManger,
 };
