@@ -3,7 +3,7 @@ import { AppRouteRecordRaw } from '../types';
 
 const home: AppRouteRecordRaw = {
   path: '/home',
-  name: 'home',
+  name: 'Home',
   component: DEFAULT_LAYOUT,
   meta: {
     locale: 'menu.home',

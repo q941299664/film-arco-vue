@@ -1,15 +1,37 @@
 <template>
   <div class="login-form-wrapper">
-    <div class="login-form-title">{{ $t('login.form.title') }}</div>
-    <div class="login-form-sub-title">{{ $t('login.form.title') }}</div>
+    <div class="login-form-title">{{
+      isLoginForm ? $t('login.form.loginTitle') : $t('login.form.registerTitle')
+    }}</div>
+    <div class="login-form-sub-title">{{
+      isLoginForm
+        ? $t('login.form.loginSubTitle')
+        : $t('login.form.registerSubTitle')
+    }}</div>
     <div class="login-form-error-msg">{{ errorMessage }}</div>
     <a-form
       ref="loginForm"
       :model="userInfo"
       class="login-form"
       layout="vertical"
-      @submit="handleSubmit"
+      @submit="handleAction"
     >
+      <a-form-item
+        v-if="!isLoginForm"
+        field="username"
+        :rules="[{ required: true, message: $t('login.form.username.errMsg') }]"
+        :validate-trigger="['change', 'blur']"
+        hide-label
+      >
+        <a-input
+          v-model="userInfo.username"
+          :placeholder="$t('login.form.username.placeholder')"
+        >
+          <template #prefix>
+            <icon-user />
+          </template>
+        </a-input>
+      </a-form-item>
       <a-form-item
         field="email"
         :rules="[
@@ -47,22 +69,54 @@
           </template>
         </a-input-password>
       </a-form-item>
+      <a-form-item
+        v-if="!isLoginForm"
+        field="confirmPassword"
+        :rules="[
+          { required: true, message: $t('login.form.confirmPassword.errMsg') },
+          { validator: checkPassword },
+        ]"
+        :validate-trigger="['change', 'blur']"
+        hide-label
+      >
+        <a-input-password
+          v-model="userInfo.confirmPassword"
+          :placeholder="$t('login.form.confirmPassword.placeholder')"
+          allow-clear
+        >
+          <template #prefix>
+            <icon-lock />
+          </template>
+        </a-input-password>
+      </a-form-item>
       <a-space :size="16" direction="vertical">
         <div class="login-form-password-actions">
           <a-checkbox
+            v-if="isLoginForm"
             checked="rememberPassword"
             :model-value="loginConfig.rememberPassword"
-            @change="setRememberPassword as any"
+            @change="setRememberPassword"
           >
             {{ $t('login.form.rememberPassword') }}
           </a-checkbox>
-          <a-link>{{ $t('login.form.forgetPassword') }}</a-link>
+          <a-link v-if="isLoginForm">{{
+            $t('login.form.forgetPassword')
+          }}</a-link>
         </div>
         <a-button type="primary" html-type="submit" long :loading="loading">
-          {{ $t('login.form.login') }}
+          {{ isLoginForm ? $t('login.form.login') : $t('login.form.register') }}
         </a-button>
-        <a-button type="text" long class="login-form-register-btn">
-          {{ $t('login.form.register') }}
+        <a-button
+          type="text"
+          long
+          class="login-form-register-btn"
+          @click="switchForm"
+        >
+          {{
+            isLoginForm
+              ? $t('login.form.switchToRegister')
+              : $t('login.form.switchToLogin')
+          }}
         </a-button>
       </a-space>
     </a-form>
@@ -78,7 +132,9 @@
   import { useStorage } from '@vueuse/core';
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
-  import type { LoginData } from '@/api/user/types';
+  import type { LoginData, RegisterData } from '@/api/user/types';
+  import { DEFAULT_ROUTE_NAME } from '@/router/constants';
+  import { register } from '@/api/user';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -92,9 +148,59 @@
     password: '', // demo default value
   });
   const userInfo = reactive({
+    username: undefined,
     email: loginConfig.value.email,
     password: loginConfig.value.password,
+    confirmPassword: undefined,
   });
+  const isLoginForm = ref(true);
+
+  const switchForm = () => {
+    isLoginForm.value = !isLoginForm.value;
+  };
+
+  const checkPassword = async (
+    value: string,
+    callback: (errMsg: string) => void
+  ) => {
+    if (value && value !== userInfo.password) {
+      callback(t('login.form.confirmPassword.errMsg.match'));
+      return false;
+    }
+    return true;
+  };
+  const handleAction = async ({
+    errors,
+    values,
+  }: {
+    errors: Record<string, ValidatedError> | undefined;
+    values: Record<string, any>;
+  }) => {
+    if (loading.value) return;
+    if (!errors) {
+      setLoading(true);
+      try {
+        if (isLoginForm.value) {
+          await userStore.login(values as LoginData);
+          router.push({ name: DEFAULT_ROUTE_NAME });
+          Message.success(t('login.form.login.success'));
+        } else {
+          // 调用注册接口
+          // Replace the following line with actual registration API call
+          await register(values as RegisterData);
+          Message.success(t('login.form.register.success'));
+          // 注册成功后可以自动登录
+          // Auto-login after successful registration
+          await userStore.login(values as LoginData);
+          router.push({ name: DEFAULT_ROUTE_NAME });
+        }
+      } catch (err) {
+        errorMessage.value = (err as Error).message;
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   const handleSubmit = async ({
     errors,
@@ -110,7 +216,7 @@
         await userStore.login(values as LoginData);
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
         router.push({
-          name: (redirect as string) || 'Workplace',
+          name: (redirect as string) || DEFAULT_ROUTE_NAME,
           query: {
             ...othersQuery,
           },
@@ -129,8 +235,10 @@
       }
     }
   };
-  const setRememberPassword = (value: boolean) => {
-    loginConfig.value.rememberPassword = value;
+  const setRememberPassword = (
+    values: boolean | (string | number | boolean)[]
+  ) => {
+    loginConfig.value.rememberPassword = values as boolean;
   };
 </script>
 
@@ -169,4 +277,3 @@
     }
   }
 </style>
-@/api/user/user

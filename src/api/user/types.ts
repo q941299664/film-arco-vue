@@ -1,10 +1,14 @@
 import { UserState } from '@/store/modules/user/types';
 
 export interface LoginData {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface LoginRes extends UserState {
   token: string;
+}
+
+export interface RegisterData extends LoginData {
+  username: string;
 }
