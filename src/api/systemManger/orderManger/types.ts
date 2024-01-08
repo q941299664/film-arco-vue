@@ -1,11 +1,11 @@
 import { BaseEntity } from '@/api/types';
 
-export interface RoleResponse extends BaseEntity {
+export interface OrderResponse extends BaseEntity {
   username: string;
   email: string;
 }
 
-export interface RoleParams extends Partial<RoleResponse> {
+export interface OrderParams extends Partial<OrderResponse> {
   current: number;
   pageSize: number;
 }

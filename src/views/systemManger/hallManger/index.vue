@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <Breadcrumb
-      :items="['menu.systemManger', 'menu.systemManger.filmManger']"
+      :items="['menu.systemManger', 'menu.systemManger.hallManger']"
     />
-    <a-card class="general-card" :title="$t('menu.systemManger.filmManger')">
+    <a-card class="general-card" :title="$t('menu.systemManger.hallManger')">
       <a-divider style="margin-top: 0" />
       <a-row style="margin-bottom: 16px">
         <a-col :span="12">
@@ -12,7 +12,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ $t('filmManger.operation.create') }}
+              {{ $t('hallManger.operation.create') }}
             </a-button>
           </a-space>
         </a-col>
@@ -20,13 +20,13 @@
           :span="12"
           style="display: flex; align-items: center; justify-content: end"
         >
-          <a-tooltip :content="$t('filmManger.actions.refresh')">
+          <a-tooltip :content="$t('hallManger.actions.refresh')">
             <div class="action-icon" @click="search"
               ><icon-refresh size="18"
             /></div>
           </a-tooltip>
           <a-dropdown @select="handleSelectDensity">
-            <a-tooltip :content="$t('filmManger.actions.density')">
+            <a-tooltip :content="$t('hallManger.actions.density')">
               <div class="action-icon"><icon-line-height size="18" /></div>
             </a-tooltip>
             <template #content>
@@ -40,7 +40,7 @@
               </a-doption>
             </template>
           </a-dropdown>
-          <a-tooltip :content="$t('filmManger.actions.columnSetting')">
+          <a-tooltip :content="$t('hallManger.actions.columnSetting')">
             <a-popover
               trigger="click"
               position="bl"
@@ -117,26 +117,26 @@
                 src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/ea8b09190046da0ea7e070d83c5d1731.svg~tplv-49unhts6dw-image.image"
               />
             </a-avatar>
-            {{ $t(`filmManger.form.contentType.${record.contentType}`) }}
+            {{ $t(`hallManger.form.contentType.${record.contentType}`) }}
           </a-space>
         </template>
         <template #filterType="{ record }">
-          {{ $t(`filmManger.form.filterType.${record.filterType}`) }}
+          {{ $t(`hallManger.form.filterType.${record.filterType}`) }}
         </template>
         <template #status="{ record }">
           <span v-if="record.status === 'offline'" class="circle"></span>
           <span v-else class="circle pass"></span>
-          {{ $t(`filmManger.form.status.${record.status}`) }}
+          {{ $t(`hallManger.form.status.${record.status}`) }}
         </template>
         <template #operations>
           <a-button type="text" size="small">
-            {{ $t('filmManger.columns.operations.view') }}
+            {{ $t('hallManger.columns.operations.view') }}
           </a-button>
           <a-button type="text" size="small">
-            {{ $t('filmManger.columns.operations.edit') }}
+            {{ $t('hallManger.columns.operations.edit') }}
           </a-button>
           <a-button type="text" size="small">
-            {{ $t('filmManger.columns.operations.remove') }}
+            {{ $t('hallManger.columns.operations.remove') }}
           </a-button>
         </template>
       </a-table>
@@ -148,11 +148,11 @@
   import { computed, ref, reactive, watch, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { queryPage } from '@/api/systemManger/filmManger';
+  import { queryPage } from '@/api/systemManger/hallManger';
   import {
-    FilmResponse,
-    FilmParams,
-  } from '@/api/systemManger/filmManger/types';
+    HallResponse,
+    HallParams,
+  } from '@/api/systemManger/hallManger/types';
 
   import { Pagination } from '@/types/global';
   import type { SelectOptionData } from '@arco-design/web-vue/es/select/interface';
@@ -171,7 +171,7 @@
   };
   const { loading, setLoading } = useLoading(true);
   const { t } = useI18n();
-  const renderData = ref<FilmResponse[]>([]);
+  const renderData = ref<HallResponse[]>([]);
   const formModel = ref(generateFormModel());
   const cloneColumns = ref<Column[]>([]);
   const showColumns = ref<Column[]>([]);
@@ -187,83 +187,83 @@
   });
   const densityList = computed(() => [
     {
-      name: t('filmManger.size.mini'),
+      name: t('hallManger.size.mini'),
       value: 'mini',
     },
     {
-      name: t('filmManger.size.small'),
+      name: t('hallManger.size.small'),
       value: 'small',
     },
     {
-      name: t('filmManger.size.medium'),
+      name: t('hallManger.size.medium'),
       value: 'medium',
     },
     {
-      name: t('filmManger.size.large'),
+      name: t('hallManger.size.large'),
       value: 'large',
     },
   ]);
   const columns = computed<TableColumnData[]>(() => [
     {
-      title: t('filmManger.columns.index'),
+      title: t('hallManger.columns.index'),
       dataIndex: 'index',
       slotName: 'index',
     },
     {
-      title: t('filmManger.columns.name'),
+      title: t('hallManger.columns.name'),
       dataIndex: 'name',
     },
 
     {
-      title: t('filmManger.columns.createTime'),
+      title: t('hallManger.columns.createTime'),
       dataIndex: 'createTime',
     },
     {
-      title: t('filmManger.columns.updateTime'),
+      title: t('hallManger.columns.updateTime'),
       dataIndex: 'updateTime',
     },
     {
-      title: t('filmManger.columns.operations'),
+      title: t('hallManger.columns.operations'),
       dataIndex: 'operations',
       slotName: 'operations',
     },
   ]);
   const contentTypeOptions = computed<SelectOptionData[]>(() => [
     {
-      label: t('filmManger.form.contentType.img'),
+      label: t('hallManger.form.contentType.img'),
       value: 'img',
     },
     {
-      label: t('filmManger.form.contentType.horizontalVideo'),
+      label: t('hallManger.form.contentType.horizontalVideo'),
       value: 'horizontalVideo',
     },
     {
-      label: t('filmManger.form.contentType.verticalVideo'),
+      label: t('hallManger.form.contentType.verticalVideo'),
       value: 'verticalVideo',
     },
   ]);
   const filterTypeOptions = computed<SelectOptionData[]>(() => [
     {
-      label: t('filmManger.form.filterType.artificial'),
+      label: t('hallManger.form.filterType.artificial'),
       value: 'artificial',
     },
     {
-      label: t('filmManger.form.filterType.rules'),
+      label: t('hallManger.form.filterType.rules'),
       value: 'rules',
     },
   ]);
   const statusOptions = computed<SelectOptionData[]>(() => [
     {
-      label: t('filmManger.form.status.online'),
+      label: t('hallManger.form.status.online'),
       value: 'online',
     },
     {
-      label: t('filmManger.form.status.offline'),
+      label: t('hallManger.form.status.offline'),
       value: 'offline',
     },
   ]);
   const fetchData = async (
-    params: FilmParams = { current: 1, pageSize: 20 }
+    params: HallParams = { current: 1, pageSize: 20 }
   ) => {
     setLoading(true);
     try {
@@ -282,7 +282,7 @@
     fetchData({
       ...basePagination,
       ...formModel.value,
-    } as unknown as FilmParams);
+    } as unknown as HallParams);
   };
   const onPageChange = (current: number) => {
     fetchData({ ...basePagination, current });
@@ -362,7 +362,7 @@
 
 <script lang="ts">
   export default {
-    name: 'FilmManger',
+    name: 'HallManger',
   };
 </script>
 
