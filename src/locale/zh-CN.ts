@@ -34,4 +34,5 @@ export default {
   ...localeHomeIndex,
   ...localeUserManger,
   ...localeRoleManger,
+  ...localeFilmManger,
 };
