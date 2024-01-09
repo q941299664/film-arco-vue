@@ -227,6 +227,7 @@
             ...othersQuery,
           },
         });
+        errorMessage.value = '';
         Message.success(t('login.form.login.success'));
         const { rememberPassword } = loginConfig.value;
         const { email, password } = values;
@@ -245,6 +246,12 @@
     values: boolean | (string | number | boolean)[]
   ) => {
     loginConfig.value.rememberPassword = values as boolean;
+  };
+</script>
+
+<script lang="ts">
+  export default {
+    name: 'LoginForm',
   };
 </script>
 
