@@ -1,9 +1,15 @@
 import axios from 'axios';
-import qs from 'query-string';
-import { UserResponse, UserParams } from './types';
 
-export function queryPage(params: UserParams) {
-  return axios.get<UserResponse>(
+import {
+  UserRecord,
+  UserParams,
+  UserListResponse,
+  UserListParams,
+} from './types';
+
+// 分页查询
+export function queryPage(params: UserListParams) {
+  return axios.get<UserListResponse>(
     `/user/page/${params.current}/${params.pageSize}`,
     {
       params,
@@ -11,4 +17,17 @@ export function queryPage(params: UserParams) {
   );
 }
 
-export default queryPage;
+// 添加
+export function addUser(data: UserParams) {
+  return axios.post<UserRecord>(`/user`, data);
+}
+
+// 删除
+export function delUser(id: number) {
+  return axios.delete<UserRecord>(`/user/${id}`);
+}
+
+// 修改
+export function editUser(data: UserParams) {
+  return axios.put<UserRecord>(`/user`, data);
+}

@@ -19,6 +19,7 @@
       <a-form-item
         v-if="!isLoginForm"
         field="username"
+        required
         :rules="[{ required: true, message: $t('login.form.username.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
@@ -34,6 +35,7 @@
       </a-form-item>
       <a-form-item
         field="email"
+        required
         :rules="[
           { required: true, message: $t('login.form.email.errMsg') },
           {
@@ -55,6 +57,7 @@
       </a-form-item>
       <a-form-item
         field="password"
+        required
         :rules="[{ required: true, message: $t('login.form.password.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
@@ -63,6 +66,7 @@
           v-model="userInfo.password"
           :placeholder="$t('login.form.password.placeholder')"
           allow-clear
+          autocomplete="off"
         >
           <template #prefix>
             <icon-lock />
@@ -72,12 +76,14 @@
       <a-form-item
         v-if="!isLoginForm"
         field="confirmPassword"
+        required
         :rules="[
           { required: true, message: $t('login.form.confirmPassword.errMsg') },
           { validator: checkPassword },
         ]"
         :validate-trigger="['change', 'blur']"
         hide-label
+        autocomplete="off"
       >
         <a-input-password
           v-model="userInfo.confirmPassword"

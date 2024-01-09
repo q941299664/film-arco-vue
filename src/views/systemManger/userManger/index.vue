@@ -8,7 +8,7 @@
       <a-row style="margin-bottom: 16px">
         <a-col :span="12">
           <a-space>
-            <a-button type="primary">
+            <a-button type="primary" @click="handleClick('add')">
               <template #icon>
                 <icon-plus />
               </template>
@@ -60,9 +60,7 @@
                     <div>
                       <a-checkbox
                         v-model="item.checked"
-                        @change="
-                          handleChange($event, item as TableColumnData, index)
-                        "
+                        @change="handleChange($event, item, index)"
                       >
                       </a-checkbox>
                     </div>
@@ -128,19 +126,94 @@
           <span v-else class="circle pass"></span>
           {{ $t(`userManger.form.status.${record.status}`) }}
         </template>
-        <template #operations>
-          <a-button type="text" size="small">
+        <template #operations="scope">
+          <a-button
+            type="text"
+            size="small"
+            @click="handleClick('view', scope.record)"
+          >
             {{ $t('userManger.columns.operations.view') }}
           </a-button>
-          <a-button type="text" size="small">
+          <a-button
+            type="text"
+            size="small"
+            @click="handleClick('edit', scope.record)"
+          >
             {{ $t('userManger.columns.operations.edit') }}
           </a-button>
-          <a-button type="text" size="small">
-            {{ $t('userManger.columns.operations.remove') }}
-          </a-button>
+          <a-popconfirm
+            :content="$t('userManger.operations.remove.content')"
+            type="error"
+            @before-ok="(done) => handleRemove(done, scope.record.id)"
+          >
+            <a-button type="text" size="small">
+              {{ $t('userManger.columns.operations.remove') }}
+            </a-button>
+          </a-popconfirm>
         </template>
       </a-table>
     </a-card>
+    <a-modal
+      v-model:visible="formVisible"
+      :title="$t(`userManger.form.title.${formFlag}`)"
+      :mask-closable="false"
+      @cancel="handleCancel"
+      @before-ok="handleBeforeOk"
+    >
+      <a-form ref="formRef" :model="form" :disabled="'view'.includes(formFlag)">
+        <a-form-item
+          field="username"
+          required
+          :label="$t(`userManger.form.username`)"
+        >
+          <a-input
+            v-model="form.username"
+            :rules="[
+              {
+                required: true,
+                message: $t('userManger.form.username.errMsg'),
+              },
+            ]"
+            :validate-trigger="['change', 'blur']"
+          />
+        </a-form-item>
+        <a-form-item
+          field="email"
+          required
+          :label="$t(`userManger.form.email`)"
+        >
+          <a-input
+            v-model="form.email"
+            :rules="[
+              {
+                required: true,
+                message: $t('userManger.form.email.errMsg'),
+              },
+            ]"
+            :validate-trigger="['change', 'blur']"
+          />
+        </a-form-item>
+
+        <a-form-item
+          v-if="!'view'.includes(formFlag)"
+          field="password"
+          :required="'add'.includes(formFlag)"
+          :label="$t(`userManger.form.password`)"
+        >
+          <a-input-password
+            v-model="form.password"
+            autocomplete="off"
+            :rules="[
+              {
+                required: true,
+                message: $t('userManger.form.password.errMsg'),
+              },
+            ]"
+            :validate-trigger="['change', 'blur']"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -148,17 +221,23 @@
   import { computed, ref, reactive, watch, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { queryPage } from '@/api/systemManger/userManger';
   import {
-    UserResponse,
-    UserParams,
+    addUser,
+    delUser,
+    editUser,
+    queryPage,
+  } from '@/api/systemManger/userManger';
+  import {
+    UserForm,
+    UserListParams,
+    UserRecord,
   } from '@/api/systemManger/userManger/types';
 
   import { Pagination } from '@/types/global';
-  import type { SelectOptionData } from '@arco-design/web-vue/es/select/interface';
   import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
   import cloneDeep from 'lodash/cloneDeep';
   import Sortable from 'sortablejs';
+  import { Message, ValidatedError } from '@arco-design/web-vue';
 
   type SizeProps = 'mini' | 'small' | 'medium' | 'large';
   type Column = TableColumnData & { checked?: true };
@@ -171,7 +250,7 @@
   };
   const { loading, setLoading } = useLoading(true);
   const { t } = useI18n();
-  const renderData = ref<UserResponse[]>([]);
+  const renderData = ref<UserRecord[]>([]);
   const formModel = ref(generateFormModel());
   const cloneColumns = ref<Column[]>([]);
   const showColumns = ref<Column[]>([]);
@@ -231,48 +310,15 @@
       slotName: 'operations',
     },
   ]);
-  const contentTypeOptions = computed<SelectOptionData[]>(() => [
-    {
-      label: t('userManger.form.contentType.img'),
-      value: 'img',
-    },
-    {
-      label: t('userManger.form.contentType.horizontalVideo'),
-      value: 'horizontalVideo',
-    },
-    {
-      label: t('userManger.form.contentType.verticalVideo'),
-      value: 'verticalVideo',
-    },
-  ]);
-  const filterTypeOptions = computed<SelectOptionData[]>(() => [
-    {
-      label: t('userManger.form.filterType.artificial'),
-      value: 'artificial',
-    },
-    {
-      label: t('userManger.form.filterType.rules'),
-      value: 'rules',
-    },
-  ]);
-  const statusOptions = computed<SelectOptionData[]>(() => [
-    {
-      label: t('userManger.form.status.online'),
-      value: 'online',
-    },
-    {
-      label: t('userManger.form.status.offline'),
-      value: 'offline',
-    },
-  ]);
+
   const fetchData = async (
-    params: UserParams = { current: 1, pageSize: 20 }
+    params: UserListParams = { current: 1, pageSize: 20 }
   ) => {
     setLoading(true);
     try {
       const { data } = await queryPage(params);
       renderData.value = data.records;
-      pagination.current = params.current;
+      pagination.current = data.current;
       pagination.total = data.total;
     } catch (err) {
       // you can report use errorHandler or other
@@ -285,7 +331,7 @@
     fetchData({
       ...basePagination,
       ...formModel.value,
-    } as unknown as UserParams);
+    } as unknown as UserListParams);
   };
   const onPageChange = (current: number) => {
     fetchData({ ...basePagination, current });
@@ -350,11 +396,57 @@
     }
   };
 
+  const formRef = ref<HTMLFormElement | null>(null);
+  const formVisible = ref(false);
+  const formFlag = ref('add');
+  const form = ref<UserForm>({});
+
+  const handleBeforeOk = (done: (closed: boolean) => void) => {
+    const submitApi = 'add'.includes(formFlag.value) ? addUser : editUser;
+    formRef.value?.validate(
+      async (err: undefined | Record<string, ValidatedError>) => {
+        if (!err) {
+          try {
+            await submitApi(form.value);
+            Message.success(t(`userManger.form.${formFlag.value}.success`));
+            form.value = {};
+            search();
+            return done(true);
+          } catch (e) {
+            Message.error(t(`userManger.form.${formFlag.value}.error`));
+            return done(false);
+          }
+        }
+        return done(false);
+      }
+    );
+  };
+  const handleCancel = () => {
+    formVisible.value = false;
+    form.value = {};
+  };
+  const handleClick = (flag: string, record: UserForm = {}) => {
+    form.value = { ...record };
+    formFlag.value = flag;
+    formVisible.value = true;
+  };
+  const handleRemove = async (done: (closed: boolean) => void, id: number) => {
+    try {
+      await delUser(id);
+      Message.success(t(`userManger.form.remove.success`));
+      search();
+      return done(true);
+    } catch (e) {
+      Message.error(t(`userManger.form.remove.error`));
+      return done(false);
+    }
+  };
+
   watch(
     () => columns.value,
     (val) => {
       cloneColumns.value = cloneDeep(val);
-      cloneColumns.value.forEach((item, index) => {
+      cloneColumns.value.forEach((item, _) => {
         item.checked = true;
       });
       showColumns.value = cloneDeep(cloneColumns.value);

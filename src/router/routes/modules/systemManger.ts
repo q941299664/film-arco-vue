@@ -45,17 +45,17 @@ const systemManger: AppRouteRecordRaw = {
         roles: ['*'],
       },
     },
-    {
-      path: 'cinemaManger',
-      name: 'cinemaManger',
-      component: () => import('@/views/systemManger/cinemaManger/index.vue'),
-      meta: {
-        locale: 'menu.cinemaManger',
-        icon: 'icon-user',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-    },
+    // {
+    //   path: 'cinemaManger',
+    //   name: 'cinemaManger',
+    //   component: () => import('@/views/systemManger/cinemaManger/index.vue'),
+    //   meta: {
+    //     locale: 'menu.cinemaManger',
+    //     icon: 'icon-user',
+    //     requiresAuth: true,
+    //     roles: ['*'],
+    //   },
+    // },
     {
       path: 'hallManger',
       name: 'hallManger',
@@ -67,17 +67,17 @@ const systemManger: AppRouteRecordRaw = {
         roles: ['*'],
       },
     },
-    {
-      path: 'showtimeManger',
-      name: 'showtimeManger',
-      component: () => import('@/views/systemManger/showtimeManger/index.vue'),
-      meta: {
-        locale: 'menu.showtimeManger',
-        icon: 'icon-user',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-    },
+    // {
+    //   path: 'showtimeManger',
+    //   name: 'showtimeManger',
+    //   component: () => import('@/views/systemManger/showtimeManger/index.vue'),
+    //   meta: {
+    //     locale: 'menu.showtimeManger',
+    //     icon: 'icon-user',
+    //     requiresAuth: true,
+    //     roles: ['*'],
+    //   },
+    // },
     {
       path: 'commentManger',
       name: 'commentManger',

@@ -25,6 +25,12 @@
   import LoginForm from './components/login-form.vue';
 </script>
 
+<script lang="ts" setup>
+  export default {
+    name: 'Login',
+  };
+</script>
+
 <style lang="less" scoped>
   .container {
     display: flex;

@@ -3,6 +3,7 @@ module.exports = {
   semi: true,
   printWidth: 80,
   singleQuote: true,
+  endOfLine: "lf",
   quoteProps: 'consistent',
   htmlWhitespaceSensitivity: 'strict',
   vueIndentScriptAndStyle: true,

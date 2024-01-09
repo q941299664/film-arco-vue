@@ -4,11 +4,11 @@ import localeHomeIndex from '@/views/home/locale/zh-CN';
 import localeUserManger from '@/views/systemManger/userManger/locale/zh-CN';
 import localeRoleManger from '@/views/systemManger/roleManger/locale/zh-CN';
 import localeMovieManger from '@/views/systemManger/movieManger/locale/zh-CN';
-import localeCinemaManger from '@/views/systemManger/cinemaManger/locale/zh-CN';
 import localeHallManger from '@/views/systemManger/hallManger/locale/zh-CN';
-import localeShowtimeManger from '@/views/systemManger/showtimeManger/locale/zh-CN';
 import localeCommentManger from '@/views/systemManger/commentManger/locale/zh-CN';
 import localeOrderManger from '@/views/systemManger/orderManger/locale/zh-CN';
+// import localeShowtimeManger from '@/views/systemManger/showtimeManger/locale/zh-CN';
+// import localeCinemaManger from '@/views/systemManger/cinemaManger/locale/zh-CN';
 import localeSettings from './zh-CN/settings';
 
 export default {
@@ -44,9 +44,9 @@ export default {
   ...localeUserManger,
   ...localeRoleManger,
   ...localeMovieManger,
-  ...localeCinemaManger,
+  // ...localeCinemaManger,
   ...localeHallManger,
-  ...localeShowtimeManger,
+  // ...localeShowtimeManger,
   ...localeCommentManger,
   ...localeOrderManger,
 };
