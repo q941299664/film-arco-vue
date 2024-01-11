@@ -17,7 +17,7 @@ const home: AppRouteRecordRaw = {
       name: 'HomeIndex',
       component: () => import('@/views/home/index.vue'),
       meta: {
-        locale: 'menu.home.index',
+        locale: 'menu.home.movie',
         requiresAuth: true,
         roles: ['*'],
       },

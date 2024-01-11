@@ -8,12 +8,10 @@ import {
 } from './types';
 
 // 分页查询
-export function queryPage(params: UserListParams) {
-  return axios.get<UserListResponse>(
-    `/user/page/${params.current}/${params.pageSize}`,
-    {
-      params,
-    }
+export function queryPage(data: UserListParams) {
+  return axios.post<UserListResponse>(
+    `/user/page/${data.current}/${data.pageSize}`,
+    data
   );
 }
 

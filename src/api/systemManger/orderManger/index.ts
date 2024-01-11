@@ -2,12 +2,10 @@ import axios from 'axios';
 import qs from 'query-string';
 import { OrderResponse, OrderParams } from './types';
 
-export function queryPage(params: OrderParams) {
-  return axios.get<OrderResponse>(
-    `/order/page/${params.current}/${params.pageSize}`,
-    {
-      params,
-    }
+export function queryPage(data: OrderParams) {
+  return axios.post<OrderResponse>(
+    `/order/page/${data.current}/${data.pageSize}`,
+    data
   );
 }
 

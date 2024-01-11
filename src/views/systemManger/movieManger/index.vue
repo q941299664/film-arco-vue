@@ -151,7 +151,7 @@
   import { queryPage } from '@/api/systemManger/movieManger';
   import {
     MovieResponse,
-    MovieParams,
+    MovieListParams,
   } from '@/api/systemManger/movieManger/types';
 
   import { Pagination } from '@/types/global';
@@ -211,7 +211,7 @@
     },
     {
       title: t('movieManger.columns.name'),
-      dataIndex: 'name',
+      dataIndex: 'title',
     },
 
     {
@@ -263,7 +263,7 @@
     },
   ]);
   const fetchData = async (
-    params: MovieParams = { current: 1, pageSize: 20 }
+    params: MovieListParams = { current: 1, pageSize: 20 }
   ) => {
     setLoading(true);
     try {
@@ -282,7 +282,7 @@
     fetchData({
       ...basePagination,
       ...formModel.value,
-    } as unknown as MovieParams);
+    } as unknown as MovieListParams);
   };
   const onPageChange = (current: number) => {
     fetchData({ ...basePagination, current });
